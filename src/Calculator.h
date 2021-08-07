@@ -13,8 +13,8 @@
 #include "../Stack.h"
 #include "../config.h"
 
-struct calculatordata {
-  uint8_t control;
+struct Calculatordata {
+  uint8_t error;
   double  ans;
 };
 
@@ -24,7 +24,7 @@ struct atod
     bool problem;
 };
 
-class calculator{
+class Calculator{
 
   private:
     uint8_t bracket = 0; //for chacking odd parenthisis
@@ -41,14 +41,14 @@ class calculator{
 
     int8_t evaluate();
     int8_t priority(char in);  //better to not use uint8_t to get a nagetive value return
-    void SpecialFunction(char data[]);
+    void function_to_char(char data[]);
     bool operation();
     bool isOperator(char c);
     char edit(char c);
     bool preedit();
 
   public:
-    calculatordata  datatosend;
+    Calculatordata  calculation_data;
     void getans(char *expressioncomming, uint8_t length_of_expression);
 };
 
