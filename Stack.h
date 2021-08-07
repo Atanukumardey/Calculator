@@ -19,7 +19,6 @@ class Stack
 {
   private:
     _DATA_TYPE_ arr[_size];       // array to store Stack elements
-    //_DATA_TYPE_ *arr;
     //_size                       // maximum capacity of the Stack
     uint16_t top = 0;           // front points to front element in the Stack (if any)
 

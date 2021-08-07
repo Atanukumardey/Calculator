@@ -48,6 +48,8 @@ class Calculator{
     bool preedit();
 
   public:
+    static const uint8_t Syntex_Error = 1;
+    static const uint8_t Math_Error = 2;
     Calculatordata  calculation_data;
     void getans(char *expressioncomming, uint8_t length_of_expression);
 };

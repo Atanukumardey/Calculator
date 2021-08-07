@@ -1,3 +1,10 @@
+/*
+   Author : Atanu Kumar Dey
+            University of Chittagong
+            Department of CSE (19th batch)
+            atanukumar251@gmail.com
+*/
+
 #include "Calculator.h"
 
 /**
@@ -10,36 +17,42 @@ int8_t Calculator::evaluate()
   if (isOperator(*Expression))
     numbers.push(0.00);
 
-  char data[char_array_size] ;
+  char data[char_array_size];
   int datacount = 0;
 
   for (uint8_t i = 0; i < Length; i++)
   {
-    char character = *Expression++;   // character takes first character from input expression
-    char edition = edit(character);   // edition takes first return from edit function for making changes or to correct the expression
+    char character = *Expression++; // character takes first character from input expression
+    char edition = edit(character); // edition takes first return from edit function for making changes or to correct the expression
     if (edition)
     {
       //Serial.println(edition);
-      switch (edition) {
-        case 'e':
-          return 1;
-        case '+':
-        case '-':
-          operators.pop(); character = edition; break;
-        case '*':
-          {
-            while (!operators.isEmpty() && priority(edition) <= priority(operators.peek())) {
-              operation();
-            }
-            operators.push(edition); break;
-          }
-        case '0':
-          numbers.push(0.00);
-          break;
-        default:
-          break;
+      switch (edition)
+      {
+      case 'e':
+        return Syntex_Error;
+      case '+':
+      case '-':
+        operators.pop();
+        character = edition;
+        break;
+      case '*':
+      {
+        while (!operators.isEmpty() && priority(edition) <= priority(operators.peek()))
+        {
+          operation();
+        }
+        operators.push(edition);
+        break;
       }
-      if (edition == '1') {
+      case '0':
+        numbers.push(0.00);
+        break;
+      default:
+        break;
+      }
+      if (edition == '1')
+      {
         skip = true;
         sign = character;
         edition = '\0';
@@ -47,7 +60,9 @@ int8_t Calculator::evaluate()
       }
       edition = '\0';
     }
-
+    /**
+     * collecting number type characters to data variable
+     */
     if ((character >= '0' && character <= '9') || character == '.')
     {
       while ((character >= '0' && character <= '9') || character == '.')
@@ -55,23 +70,25 @@ int8_t Calculator::evaluate()
         data[datacount++] = character;
         if (i < Length)
           character = *Expression++, i++;
-        else break;
+        else
+          break;
       }
 
-      Expression--, i--;// decresing the counter for last char that didn't fullfilled the condition
+      Expression--, i--; // decresing the counter for last char that didn't fullfilled the condition
 
       previous = *(Expression - 1);
       data[datacount] = '\0';
 
-      atod num = atodouble(data, datacount);
-      
+      atod num = atodouble(data, datacount);   // converting number in data[] array to double
+
       if (!num.problem)
         numbers.push(num.number);
       else
-        return 1;
+        return Syntex_Error;
       datacount = 0;
     }
-    else if (isOperator(character)) {
+    else if (isOperator(character))
+    {
 
       //1. If current operator has higher precedence than operator on top of the stack,
       //the current operator can be placed in stack
@@ -79,14 +96,19 @@ int8_t Calculator::evaluate()
       //either stack is not empty or current operator has higher precedence than operator on top of the stack
       //Serial.println("here1");
 
-      while (!operators.isEmpty() && priority(character) <= priority(operators.peek())) {
-        //Serial.println("here2");
+      while (!operators.isEmpty() && priority(character) <= priority(operators.peek()))
+      {
+        //Serial.println("place-2");
         operation();
       }
       //now pushing current operator to stack// also handels the condition that dosen't go through the while loop
 
       operators.push(character);
     }
+
+    /**
+     * collecting alphabetic type characters to data variable that can express a function name. like -- log, sin
+     */
     else if (character >= 'a' && character <= 'z')
     {
       while (character >= 'a' && character <= 'z')
@@ -97,33 +119,41 @@ int8_t Calculator::evaluate()
       Expression--, i--; //decresing the counter for last char tha didn't fullfilled the condition
       previous = *(Expression - 1);
       data[datacount] = '\0';
-      function_to_char(data);
+
+      function_to_char(data);   // converting function name to a single character 
+
       if (data[0] == '0')
-        return 1;
+        return Syntex_Error;
       operators.push(data[0]);
+
       //memset(data, '\0', sizeof(data));
       datacount = 0;
     }
-    else if (character == '(') {
+    else if (character == '(')
+    {
       bracket++;
       operators.push(character);
     }
-    else if (character == ')') {
-      if (bracket) {
-        while (operators.peek() != '(') {
+    else if (character == ')')
+    {
+      if (bracket)    // if number of bracket(left) is greater than 0
+      {
+        while (operators.peek() != '(')
+        {
           if (!operation())
-            return 2;
+            return Math_Error;
         }
         // take out "(" left bracket
         operators.pop();
       }
-      else return 1;
+      else
+        return Syntex_Error;
     }
-
   }
-  while (!operators.isEmpty()) {
+  while (!operators.isEmpty())
+  {
     if (!operation())
-      return 2;
+      return Math_Error;
   }
   return 0;
 }
@@ -133,21 +163,21 @@ int8_t Calculator::evaluate()
  * \param[in] operation 
  * \return values from first range (1-3) for general symbols -1 for bracket and 4 for functions
  */
- 
 
-int8_t Calculator::priority(char operation)  //better to not use uint8_t to get first nagetive value return
+int8_t Calculator::priority(char operation) //better to not use uint8_t to get first nagetive value return
 {
-  switch (operation) {
-    case '+':
-    case '-':
-      return 1;
-    case '*':
-    case '/':
-      return 2;
-    case '^':
-      return 3;
-    case '(':
-      return -1;
+  switch (operation)
+  {
+  case '+':
+  case '-':
+    return 1;
+  case '*':
+  case '/':
+    return 2;
+  case '^':
+    return 3;
+  case '(':
+    return -1;
   }
   return 4;
 }
@@ -157,7 +187,6 @@ int8_t Calculator::priority(char operation)  //better to not use uint8_t to get 
  * \param[in] data character array of related function name
  * replces data[0] if incoming array matchs any function name
  */
- 
 
 void Calculator::function_to_char(char data[])
 {
@@ -179,14 +208,14 @@ void Calculator::function_to_char(char data[])
     data[0] = 'l';
   else if (!strcmp("loge", data))
     data[0] = 'e';
-  else data[0] = '0';
+  else
+    data[0] = '0';  // incase it is not a function defined here
 }
 
 /**
  * \brief Does all the arithmetic operatoions and funcational implementation
  * \param[in]
  */
- 
 
 bool Calculator::operation()
 {
@@ -198,67 +227,86 @@ bool Calculator::operation()
   {
     double first = numbers.pop();
     double second = numbers.pop();
-    
-    if (skip) {
+
+    if (skip)
+    {
       if (sign == '-')
         first = -first;
       skip = false;
       sign = '\0';
     }
-    switch (operation) {
-      case '+':
-        numbers.push( first + second); break;
-      case '-':
-        numbers.push( second - first); break;
-      case '*':
-        numbers.push( first * second); break;
-      case '/':
-        if (first == 0)
-        {
-          return false;
-        }
-        else{
-          numbers.push( second / first); break;
-        }
-      case '^':
-/*         Serial.print(first);
+    switch (operation)
+    {
+    case '+':
+      numbers.push(first + second);
+      break;
+    case '-':
+      numbers.push(second - first);
+      break;
+    case '*':
+      numbers.push(first * second);
+      break;
+    case '/':
+      if (first == 0)
+      {
+        return false;
+      }
+      else
+      {
+        numbers.push(second / first);
+        break;
+      }
+    case '^':
+      /*         Serial.print(first);
         Serial.print(" ");
         Serial.println(second); */
-        numbers.push(pow(second, first)); break;
-      default:
-        return false;
+      numbers.push(pow(second, first));
+      break;
+    default:
+      return false;
     }
   }
 
-  else {
+  else
+  {
     double first = numbers.pop();
-    switch (operation) {
-      case 's':
-        first = (first * PI) / 180;
-        numbers.push(sin(first)); break;
-      case 'c':
-        first = (first * PI) / 180;
-        numbers.push(cos(first)); break;
-      case 't':
-        first = (first * PI) / 180;
-        numbers.push(tan(first)); break;
-      case 'x':
-        first = asin(first);
-        numbers.push((first * 180) / PI); break;
-      case 'y':
-        first = acos(first);
-        numbers.push((first * 180) / PI); break;
-      case 'z':
-        first = atan(first);
-        numbers.push((first * 180) / PI); break;
-      case 'l':
-        numbers.push(log10(first)); break;
-      case 'e':
-        numbers.push(log(first)); break;
-      case 'q':
-        numbers.push(sqrt(first)); break;
-      default :
-        return false;
+    switch (operation)
+    {
+    case 's':
+      first = (first * PI) / 180;
+      numbers.push(sin(first));
+      break;
+    case 'c':
+      first = (first * PI) / 180;
+      numbers.push(cos(first));
+      break;
+    case 't':
+      first = (first * PI) / 180;
+      numbers.push(tan(first));
+      break;
+    case 'x':
+      first = asin(first);
+      numbers.push((first * 180) / PI);
+      break;
+    case 'y':
+      first = acos(first);
+      numbers.push((first * 180) / PI);
+      break;
+    case 'z':
+      first = atan(first);
+      numbers.push((first * 180) / PI);
+      break;
+    case 'l':
+      numbers.push(log10(first));
+      break;
+    case 'e':
+      numbers.push(log(first));
+      break;
+    case 'q':
+      numbers.push(sqrt(first));
+      break;
+    default:
+      return false;
     }
   }
   return true;
@@ -270,18 +318,21 @@ bool Calculator::operation()
  * \return true if character is an operator
  */
 
-bool Calculator::isOperator(char character) {
-  return (character == '+' || character == '-' || character == '/' || character == '*' || character == '^');// can try for first switch
+bool Calculator::isOperator(char character)
+{
+  return (character == '+' || character == '-' || character == '/' || character == '*' || character == '^'); // can try for first switch
 }
 
 char Calculator::edit(char character)
 {
   char temp = '\0';
-  if (!previous) {
+  if (!previous)
+  {
     previous = character;
     return temp;
   }
-  else {
+  else
+  {
     if (previous == ')' && character == '(')
       temp = '*';
     else if (previous == '(' && (character == '-' || character == '+'))
@@ -302,13 +353,13 @@ char Calculator::edit(char character)
       temp = '*';
     else if ((previous == '*' || previous == '/') && ((character == '*' || character == '/') || (character == '+' || character == '-'))) //
       temp = 'e';
-    else if ((previous == '+' || previous  == '-') && ( character == '*' || character == '/'))
+    else if ((previous == '+' || previous == '-') && (character == '*' || character == '/'))
       temp = 'e';
     else
       temp = '\0';
   }
   previous = character;
-  return temp ;
+  return temp;
 }
 
 /**
@@ -331,14 +382,14 @@ bool Calculator::preedit()
   while (isOperator(*last) && Length)
   {
 
-    Length--; last--;
+    Length--;
+    last--;
   }
   if (!Length)
     return false;
 
   return true;
 }
-
 
 /**
  * \brief Does any edition into the incoming expression if needed
@@ -357,7 +408,8 @@ void Calculator::getans(char *expressioncomming, uint8_t length_of_expression)
 
   if (preedit())
     calculation_data.error = evaluate();
-  else calculation_data.error = 1;
+  else
+    calculation_data.error = Syntex_Error;
 
   if (!calculation_data.error)
     calculation_data.ans = numbers.pop();
@@ -367,7 +419,7 @@ void Calculator::getans(char *expressioncomming, uint8_t length_of_expression)
   Expression = NULL;
   previous = '\0';
 
-  return ;
+  return;
 }
 
 /**
@@ -379,48 +431,48 @@ void Calculator::getans(char *expressioncomming, uint8_t length_of_expression)
 
 atod Calculator::atodouble(char char_array[], int size)
 {
-    atod char_num;
-    char_num.problem = false;
-    char_num.number = 0.00;
-    int dotindex = 0;
-    double multiplier = 1;
-    int i=0;
-    while(char_array[i++]!='.'&&i<=size){}
-    
-      dotindex = i;
-      i-=2;
-    //Serial.print("i -- ");
-    //Serial.println(i);
-    while(i>=0)
-    {
-        char_num.number+=(char_array[i]-'0')*multiplier;
-        multiplier*=10.00;
-        i--;
-    }
-    multiplier = 1;
-    while(dotindex<=size&&char_array[dotindex]!='\0')
-    {
-        if(char_array[dotindex]=='.')
-        {
-            char_num.problem = true;
-            return char_num;
-        }
-        else
-        {
-            multiplier/=10.00;
-            char_num.number+=(char_array[dotindex++]-'0')*multiplier;
-        }
-    }
-    return char_num;
+  atod char_num;
+  char_num.problem = false;
+  char_num.number = 0.00;
+  int dotindex = 0;
+  double multiplier = 1;
+  int i = 0;
+  while (char_array[i++] != '.' && i <= size)
+  {
+  }
 
+  dotindex = i;
+  i -= 2;
+  //Serial.print("i -- ");
+  //Serial.println(i);
+  while (i >= 0)
+  {
+    char_num.number += (char_array[i] - '0') * multiplier;
+    multiplier *= 10.00;
+    i--;
+  }
+  multiplier = 1;
+  while (dotindex <= size && char_array[dotindex] != '\0')
+  {
+    if (char_array[dotindex] == '.')
+    {
+      char_num.problem = true;
+      return char_num;
+    }
+    else
+    {
+      multiplier /= 10.00;
+      char_num.number += (char_array[dotindex++] - '0') * multiplier;
+    }
+  }
+  return char_num;
 }
-
 
 /*notes --
 
    check precedence problem first
    '(' & ')' can make problem in operators stack
-   careful about using (character>='first'&&character<='z') in precedence & isOperator function
+   careful about using (character>='a'&&character<='z') in precedence & isOperator function
    check if the string received correctly
    check for overflow
 
