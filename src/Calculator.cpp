@@ -116,15 +116,22 @@ int8_t Calculator::evaluate()
         data[datacount++] = character;
         character = *Expression++, i++;
       }
+	  if(data[datacount-1] == 'g' && character == '2'){		// for handling log2
+		  data[datacount++]=character;
+		  character = *Expression++, i++;
+	  }
       Expression--, i--; //decresing the counter for last char tha didn't fullfilled the condition
-      previous = *(Expression - 1);
       data[datacount] = '\0';
 
       function_to_char(data);   // converting function name to a single character 
 
       if (data[0] == '0')
         return Syntex_Error;
+	
       operators.push(data[0]);
+	  
+	  previous = data[0];//*(Expression - 1);	// that keep tracks of previous character that helps to compare with next character and correct errors
+	  Serial.println(previous);
 
       //memset(data, '\0', sizeof(data));
       datacount = 0;
@@ -208,6 +215,8 @@ void Calculator::function_to_char(char data[])
     data[0] = 'l';
   else if (!strcmp("loge", data))
     data[0] = 'e';
+  else if (!strcmp("log2", data))
+	data[0] = 'g';
   else
     data[0] = '0';  // incase it is not a function defined here
 }
@@ -304,6 +313,9 @@ bool Calculator::operation()
       break;
     case 'q':
       numbers.push(sqrt(first));
+      break;
+    case 'g':
+      numbers.push(log(first)/log(2));
       break;
     default:
       return false;

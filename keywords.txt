@@ -1,0 +1,10 @@
+Calculator	KEYWORD1	Calculator
+
+getans	KEYWORD2
+
+calculation_data	KEYWORD2
+error	KEYWORD2
+ans	KEYWORD2
+
+Syntex_Error KEYWORD2
+Math_Error KEYWORD2
