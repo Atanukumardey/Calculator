@@ -7,7 +7,7 @@
 
 /**
  * This example shows an implementation of calculator library using serial input and output
- * input like - sqr((cos(45)/tan(25/5+6*32))*10)
+ * input like - sqrt((cos(45)/tan(25/5+6*32))*10)
  */
 
 
