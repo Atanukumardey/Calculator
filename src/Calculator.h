@@ -42,10 +42,11 @@ class Calculator{
     int8_t evaluate();
     int8_t priority(char in);  //better to not use uint8_t to get a nagetive value return
     void function_to_char(char data[]);
-    bool operation();
+    bool execute_operation();
     bool isOperator(char c);
     char edit(char c);
     bool preedit();
+	atod converted_num;
 
   public:
     static const uint8_t Syntex_Error = 1;
