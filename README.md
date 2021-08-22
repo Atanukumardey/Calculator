@@ -33,3 +33,4 @@ which can be accessed by `calculation_data` objcet from `calculator class`.
   * Any kind of `Error` will be reported through `calculator_data.error` which can be:
     1. `Syntex_Error` for any syntactic error.
     2. `Math_Error` for any kind of undefined number of operation.
+## Example
