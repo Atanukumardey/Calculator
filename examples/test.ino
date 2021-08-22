@@ -15,7 +15,6 @@
 #include <Arduino.h>
 
 #include <Calculator.h>
-
 Calculator calculator; // creating object
 
 char expression[200]; // variable to take expression input
@@ -27,7 +26,11 @@ void mathcalculation()
   {
     if (Serial.available())
     {
+<<<<<<< HEAD
       delay(60); // waiting sometime to arrive full expression in case it is long
+=======
+      delay(45); // waiting sometime to arrive full expression in case it is long
+>>>>>>> 911a1bc (Update)
       exindex = 0;
       memset(expression, '\0', sizeof(expression));
       while (Serial.available())
