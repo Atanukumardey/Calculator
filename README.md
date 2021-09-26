@@ -10,9 +10,9 @@ struct calculatordata {
   double  ans;
 };
 ```
-where `error` holds error of input array if any and `ans`  holds the answer.
+where `error` holds error of input array if any, and `ans`  holds the answer.
 
-which can be accessed by `calculation_data` objcet from `calculator class`.
+which can be accessed by `calculation_data` object from `calculator class`.
 
 
 ## Syntex
